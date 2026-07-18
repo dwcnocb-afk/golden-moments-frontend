@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-pitch: #10241a;
+  --color-card: #17321f;
+  --color-card-alt: #1d3a26;
+  --color-line: #2a4a35;
+  --color-chalk: #f3eee2;
+  --color-gold: #e8a33d;
+  --color-cyan: #6ee7c8;
+  --color-muted: #8fa396;
+
+  --font-display: "Archivo Black", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-pitch);
+  color: var(--color-chalk);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.perforation {
+  height: 4px;
+  background-image: radial-gradient(circle, var(--color-pitch) 2px, transparent 2px);
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
