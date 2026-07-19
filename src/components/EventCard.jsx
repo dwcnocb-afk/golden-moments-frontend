@@ -5,11 +5,6 @@ export default function EventCard({ event }) {
 
   return (
     <div className="flex w-full items-center gap-3 rounded-sm bg-card p-3.5">
-      {!isCard && (
-        <span className="w-10 shrink-0 font-mono text-sm font-medium text-gold">
-          {event.minute}
-        </span>
-      )}
       <div className="min-w-0">
         <p className={`truncate text-[13px] font-semibold ${event.type === "goal" ? "text-gold" : "text-chalk"}`}>{event.text}</p>
         <p className="truncate text-[11px] text-muted">
