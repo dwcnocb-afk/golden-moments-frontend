@@ -34,6 +34,7 @@ export default function Predict() {
   const [selectedId, setSelectedId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [confirmedPlayer, setConfirmedPlayer] = useState(null);
   const { publicKeyString } = useFanWallet();
   const navigate = useNavigate();
 
@@ -57,12 +58,26 @@ export default function Predict() {
         matchId,
         playerId: selectedId,
       });
-      navigate(`/match/${matchId}/goal-moment`);
+      const allPlayers = lineups
+        ? [
+            ...lineups.home.starters,
+            ...lineups.home.bench,
+            ...lineups.away.starters,
+            ...lineups.away.bench,
+          ]
+        : [];
+      const player = allPlayers.find((p) => p.id === selectedId);
+      setConfirmedPlayer(player?.name ?? "your pick");
     } catch (err) {
       setError(err.message);
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function handleCloseConfirmation() {
+    setConfirmedPlayer(null);
+    navigate(`/match/${matchId}/goal-moment`);
   }
 
   const headerLabel = lineups ? `${lineups.home.team} vs ${lineups.away.team}` : "Loading…";
@@ -135,6 +150,20 @@ export default function Predict() {
           {submitting ? "LOCKING IN…" : "LOCK IN PREDICTION"}
         </Button>
       </div>
+
+      {confirmedPlayer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-5">
+          <div className="w-full max-w-xs rounded bg-card p-5 text-center">
+            <p className="font-display text-lg text-chalk">Your bet has been placed</p>
+            <p className="mt-2 font-mono text-[12px] tracking-wide text-gold">
+              BET: {confirmedPlayer.toUpperCase()} TO SCORE THE NEXT GOAL
+            </p>
+            <div className="mt-4">
+              <Button onClick={handleCloseConfirmation}>OK</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </Screen>
   );
 }
