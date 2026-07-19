@@ -82,7 +82,9 @@ export default function MatchSelect() {
               </span>
             </span>
             <Pill tone={stateTone(match.gameState)}>
-              {activatingId === match.id ? "LOADING…" : (match.gameState || "scheduled").toUpperCase()}
+              {activatingId === match.id
+  ? "LOADING…"
+  : String(match.gameState || "scheduled").toUpperCase()}
             </Pill>
           </button>
         ))}
