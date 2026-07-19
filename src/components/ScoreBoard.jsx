@@ -1,3 +1,4 @@
+import { flagFor } from "../lib/flags";
 export default function ScoreBoard({ match }) {
   if (!match) return null;
 
