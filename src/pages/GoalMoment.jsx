@@ -1,24 +1,28 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Screen from "../components/Screen";
 import Pill from "../components/Pill";
 import Button from "../components/Button";
 import { getLatestGoalMoment } from "../lib/api";
-import { MATCH_ID } from "../lib/config";
+import { useFanWallet } from "../hooks/useFanWallet";
 
 export default function GoalMoment() {
+  const { matchId } = useParams();
   const [moment, setMoment] = useState(null);
+  const { publicKeyString } = useFanWallet();
   const navigate = useNavigate();
 
   useEffect(() => {
     let cancelled = false;
-    getLatestGoalMoment(MATCH_ID).then((data) => {
+    // Pass the fan's wallet so the backend resolves *their* prediction
+    // for this goal instead of the generic "pending" default.
+    getLatestGoalMoment(matchId, publicKeyString).then((data) => {
       if (!cancelled) setMoment(data);
     });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [matchId, publicKeyString]);
 
   if (!moment) {
     return (
