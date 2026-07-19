@@ -1,8 +1,7 @@
 import { NavLink } from "react-router-dom";
 
 const items = [
-  { to: "/", label: "Live" },
-  { to: "/predict", label: "Predict" },
+  { to: "/", label: "Matches" },
   { to: "/stubs", label: "Stubs" },
 ];
 
@@ -14,6 +13,7 @@ export default function BottomNav() {
           <NavLink
             key={item.to}
             to={item.to}
+            end={item.to === "/"}
             className={({ isActive }) =>
               `font-mono text-[11px] tracking-wide transition-colors ${
                 isActive ? "text-gold" : "text-muted"
