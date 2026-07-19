@@ -1,8 +1,9 @@
 import { API_BASE_URL, USE_MOCK_API } from "./config";
 import {
+  mockMatches,
   mockMatch,
   mockEvents,
-  mockPlayers,
+  mockLineups,
   mockGoalMoment,
   mockStubs,
 } from "./mockData";
@@ -23,7 +24,25 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// --- Matches & live events ---
+// --- Browsing matches (GET /matches, POST /matches/:id/activate) ---
+
+export async function getMatches() {
+  if (USE_MOCK_API) {
+    await delay(200);
+    return mockMatches;
+  }
+  return request(`/matches`);
+}
+
+export async function activateMatch(matchId) {
+  if (USE_MOCK_API) {
+    await delay(150);
+    return { id: matchId, activated: true, mock: true };
+  }
+  return request(`/matches/${matchId}/activate`, { method: "POST" });
+}
+
+// --- A single match & its live events ---
 
 export async function getMatch(matchId) {
   if (USE_MOCK_API) {
@@ -41,12 +60,14 @@ export async function getMatchEvents(matchId) {
   return request(`/match/${matchId}/events`);
 }
 
-export async function getMatchPlayers(matchId) {
+// Grouped starters/bench per team, plus hasLineupData so the UI can tell
+// "no lineup posted yet" apart from "roster fetch failed".
+export async function getMatchLineups(matchId) {
   if (USE_MOCK_API) {
     await delay(200);
-    return mockPlayers;
+    return mockLineups;
   }
-  return request(`/match/${matchId}/players`);
+  return request(`/match/${matchId}/lineups`);
 }
 
 // --- Predictions ---
@@ -71,11 +92,13 @@ export async function getPredictionsForWallet(wallet) {
 }
 
 // --- Goal moment (used to render the reveal screen after a resolution) ---
-
-export async function getLatestGoalMoment(matchId) {
+// Pass the fan's wallet so the backend can resolve *their* prediction for
+// this goal instead of returning the generic "pending" default.
+export async function getLatestGoalMoment(matchId, wallet) {
   if (USE_MOCK_API) {
     await delay(200);
     return mockGoalMoment;
   }
-  return request(`/match/${matchId}/latest-goal`);
+  const query = wallet ? `?wallet=${encodeURIComponent(wallet)}` : "";
+  return request(`/match/${matchId}/latest-goal${query}`);
 }
