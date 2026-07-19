@@ -56,7 +56,7 @@ export default function LiveMatch() {
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-gold" aria-hidden="true" />
           <span className="font-mono text-xs tracking-wide text-gold">
-            {match ? `LIVE · ${match.minute}'` : "LOADING…"}
+            {match ? "LIVE" : "LOADING…"}
           </span>
         </div>
       </div>
