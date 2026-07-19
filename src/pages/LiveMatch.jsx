@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import Screen from "../components/Screen";
 import ScoreBoard from "../components/ScoreBoard";
+import StatsRow from "../components/StatsRow";
 import EventCard from "../components/EventCard";
 import Button from "../components/Button";
-import { getMatch, getMatchEvents } from "../lib/api";
-import { MATCH_ID } from "../lib/config";
+import { getMatch, getMatchEvents, activateMatch } from "../lib/api";
 
 const POLL_INTERVAL_MS = 5000;
 
 export default function LiveMatch() {
+  const { matchId } = useParams();
   const [match, setMatch] = useState(null);
   const [events, setEvents] = useState([]);
   const [error, setError] = useState(null);
@@ -18,11 +19,15 @@ export default function LiveMatch() {
   useEffect(() => {
     let cancelled = false;
 
+    // Warm the fixture up (no-op if it's already tracked). Errors are
+    // non-fatal - GET /match/:id below will lazily fetch it anyway.
+    activateMatch(matchId).catch(() => {});
+
     async function load() {
       try {
         const [matchData, eventsData] = await Promise.all([
-          getMatch(MATCH_ID),
-          getMatchEvents(MATCH_ID),
+          getMatch(matchId),
+          getMatchEvents(matchId),
         ]);
         if (!cancelled) {
           setMatch(matchData);
@@ -40,19 +45,25 @@ export default function LiveMatch() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, []);
+  }, [matchId]);
 
   return (
     <Screen>
-      <div className="flex items-center gap-2">
-        <span className="h-1.5 w-1.5 rounded-full bg-gold" aria-hidden="true" />
-        <span className="font-mono text-xs tracking-wide text-gold">
-          {match ? `LIVE · ${match.minute}'` : "LOADING…"}
-        </span>
+      <div className="flex items-center justify-between">
+        <Link to="/" className="text-[11px] font-medium text-muted hover:text-gold">
+          ← All matches
+        </Link>
+        <div className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-gold" aria-hidden="true" />
+          <span className="font-mono text-xs tracking-wide text-gold">
+            {match ? `LIVE · ${match.minute}'` : "LOADING…"}
+          </span>
+        </div>
       </div>
 
       <div className="mt-5">
         <ScoreBoard match={match} />
+        <StatsRow stats={match?.stats} odds={match?.odds} />
       </div>
 
       {error && (
@@ -73,7 +84,9 @@ export default function LiveMatch() {
       </div>
 
       <div className="mt-6">
-        <Button onClick={() => navigate("/predict")}>MAKE YOUR PREDICTION</Button>
+        <Button onClick={() => navigate(`/match/${matchId}/predict`)}>
+          MAKE YOUR PREDICTION
+        </Button>
       </div>
     </Screen>
   );
